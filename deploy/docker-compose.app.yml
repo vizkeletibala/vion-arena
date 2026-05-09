@@ -8,6 +8,7 @@ services:
       APP_ALLOWED_ORIGINS: ${APP_ALLOWED_ORIGINS:-http://arena.vion.test}
     labels:
       - traefik.enable=true
+      - traefik.docker.network=${EDGE_NETWORK:-edge}
       - traefik.http.routers.vion-arena-api.rule=Host(`${ARENA_API_HOST:-api.arena.vion.test}`)
       - traefik.http.routers.vion-arena-api.entrypoints=web
       - traefik.http.services.vion-arena-api.loadbalancer.server.port=8000
@@ -28,6 +29,7 @@ services:
       - backend
     labels:
       - traefik.enable=true
+      - traefik.docker.network=${EDGE_NETWORK:-edge}
       - traefik.http.routers.vion-arena.rule=Host(`${ARENA_HOST:-arena.vion.test}`)
       - traefik.http.routers.vion-arena.entrypoints=web
       - traefik.http.services.vion-arena.loadbalancer.server.port=80

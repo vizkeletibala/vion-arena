@@ -62,6 +62,8 @@ pipeline {
           FRONTEND_IMAGE="$FRONTEND_IMAGE" \
           APP_VERSION="$IMAGE_TAG" \
           APP_ALLOWED_ORIGINS="http://$APP_HOST" \
+          ARENA_HOST="$APP_HOST" \
+          ARENA_API_HOST="$API_HOST" \
           EDGE_NETWORK="$EDGE_NETWORK" \
           INTERNAL_NETWORK="$INTERNAL_NETWORK" \
           docker compose -f deploy/docker-compose.app.yml up -d
