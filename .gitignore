@@ -1,0 +1,39 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Frontend artifacts
+frontend/node_modules/
+frontend/dist/
+coverage/
+*.tsbuildinfo
+
+# Python artifacts
+backend/.venv/
+.venv/
+venv/
+env/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.mypy_cache/
+backend/**/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test and runtime leftovers
+.pytest_cache/
+.ruff_cache/
+*.log
+tmp/
+.tmp/
+
+# Local environment files
+.env
+.env.*
+!.env.example

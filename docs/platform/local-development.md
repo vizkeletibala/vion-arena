@@ -1,0 +1,80 @@
+# Local Development
+
+This file describes how the current platform is meant to be used on a developer or team machine.
+
+## Start The Platform
+
+Main stack:
+
+```bash
+docker compose up -d
+```
+
+Optional wildcard DNS helper:
+
+```bash
+docker compose --profile dns up -d dnsmasq
+```
+
+## Main URLs
+
+- Traefik dashboard: `http://localhost:8080` or `http://traefik.vion.test`
+- Jenkins: `http://localhost:8081` or `http://jenkins.vion.test`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000` or `http://grafana.vion.test`
+- cAdvisor: `http://localhost:8083` or `http://cadvisor.vion.test`
+- Registry: `http://registry.localhost`
+
+## DNS Strategy
+
+The README describes a one-step team DNS flow using a wildcard `*.vion.test` domain through `dnsmasq`.
+
+That is convenient for:
+
+- shared LAN environments
+- demo machines
+- small teams using the same stack host
+
+If you do not want local DNS changes, you can still use direct host ports such as `3000`, `8081`, and `9090`.
+
+## Default Credentials
+
+Grafana defaults:
+
+```text
+admin / admin
+```
+
+Jenkins first-run setup is still enabled, so expect manual bootstrap in a fresh environment.
+
+## What Another Codex Session Should Know
+
+If this platform is copied into a game repo, the local-dev experience depends on a few conventions:
+
+- services should log to stdout or stderr
+- services should expose metrics when possible
+- routed apps need explicit Traefik labels
+- observable apps need explicit logging and metrics labels
+
+Without those labels, the stack will not automatically discover everything.
+
+## Good First Checks
+
+Useful commands after startup:
+
+```bash
+docker compose ps
+docker compose logs --tail=100 promtail
+docker compose logs --tail=100 traefik
+curl -sS http://localhost:9090/-/ready
+curl -sS http://localhost:3000/api/health
+```
+
+## Recommended Adaptation For A Game Repo
+
+- keep the same platform stack in a separate compose file, such as `docker-compose.platform.yaml`
+- keep game services in their own compose file
+- connect both files through shared networks and naming conventions
+- keep observability opt-in through labels so local experiments stay lightweight
+
+This keeps platform concerns separate from game runtime services while still letting them work together during development and deployment.
