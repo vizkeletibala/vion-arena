@@ -36,9 +36,27 @@ Provisioned datasources:
 - Prometheus: `http://prometheus:9090`
 - Loki: `http://loki:3100`
 
+Stable datasource UIDs:
+
+- Prometheus: `prometheus`
+- Loki: `loki`
+
 Datasource file:
 
 - `platform-stack/grafana/provisioning/datasources/datasources.yaml`
+
+Dashboard provisioning files:
+
+- `platform-stack/grafana/provisioning/dashboards/dashboards.yaml`
+- `platform-stack/grafana/provisioning/dashboards/vion-arena/app-health.json`
+- `platform-stack/grafana/provisioning/dashboards/vion-arena/containers-health.json`
+
+Provisioned dashboards currently included:
+
+- `Vion Arena App Health`
+- `Vion Arena Containers & Platform Health`
+
+These dashboards are loaded from the mounted provisioning directory, so they persist through Grafana container restarts.
 
 ### Loki
 
@@ -156,6 +174,7 @@ If the game eventually uses Kubernetes or a hosted logging platform, these docs 
 ## Security And Ops Notes
 
 - Grafana defaults are fine for local use only.
+- The compose defaults are `admin / admin`, but the live password may differ once Grafana has written state into the persistent `grafana-data` volume.
 - Loki storage is local filesystem, not object storage.
 - Prometheus retention is short and intended for a small stack.
 - Promtail depends on Docker log files, so non-Docker processes will need a different scrape method.

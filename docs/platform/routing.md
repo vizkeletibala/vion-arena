@@ -19,6 +19,8 @@ Current routed hostnames:
 - `cadvisor.vion.test`
 - `registry.localhost`
 
+The registry also exposes a direct Docker endpoint on `localhost:5000`, but that is not a Traefik-routed hostname. Use the routed hostname for browser-style HTTP access and the direct port for Docker CLI operations.
+
 ## Label Pattern
 
 Each routed service follows this shape:

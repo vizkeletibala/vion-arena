@@ -61,7 +61,7 @@ Useful backend environment variables:
 Build the backend image:
 
 ```bash
-docker build -t registry.localhost/vion-arena-backend:dev -f backend/Dockerfile backend
+docker build -t localhost:5000/vion-arena-backend:dev -f backend/Dockerfile backend
 ```
 
 Build the frontend image:
@@ -69,16 +69,18 @@ Build the frontend image:
 ```bash
 docker build \
   --build-arg VITE_API_BASE_URL=http://api.arena.vion.test \
-  -t registry.localhost/vion-arena-frontend:dev \
+  -t localhost:5000/vion-arena-frontend:dev \
   -f frontend/Dockerfile frontend
 ```
 
 Push images to the local registry:
 
 ```bash
-docker push registry.localhost/vion-arena-backend:dev
-docker push registry.localhost/vion-arena-frontend:dev
+docker push localhost:5000/vion-arena-backend:dev
+docker push localhost:5000/vion-arena-frontend:dev
 ```
+
+The shared platform still routes the registry UI and HTTP API at `registry.localhost`, but Docker pushes and pulls on this machine should use the directly published endpoint `localhost:5000`.
 
 ## Deployment With The Shared Platform
 
@@ -101,8 +103,8 @@ Default routed hostnames:
 Deploy with explicit images:
 
 ```bash
-BACKEND_IMAGE=registry.localhost/vion-arena-backend:dev \
-FRONTEND_IMAGE=registry.localhost/vion-arena-frontend:dev \
+BACKEND_IMAGE=localhost:5000/vion-arena-backend:dev \
+FRONTEND_IMAGE=localhost:5000/vion-arena-frontend:dev \
 APP_ALLOWED_ORIGINS=http://arena.vion.test \
 docker compose -f deploy/docker-compose.app.yml up -d
 ```
@@ -116,11 +118,13 @@ Pipeline stages:
 1. Run frontend checks in a Node container
 2. Run backend linting and pytest in a Python container
 3. Build Docker images
-4. Push images to `registry.localhost`
+4. Push images to `localhost:5000`
 5. Deploy with `deploy/docker-compose.app.yml`
 6. Run `scripts/smoke-test.sh`
 
 Because Jenkins has Docker socket access, it can run the pipeline without installing Node or Python on the agent itself.
+
+The pipeline uses `--volumes-from "$HOSTNAME"` for the temporary test containers instead of bind-mounting `$PWD`. That matters because Jenkins talks to the host Docker daemon through `/var/run/docker.sock`, so container-internal paths cannot be mounted reliably with `-v "$PWD":...`.
 
 ## Observability
 
@@ -134,6 +138,11 @@ Application labels in `deploy/docker-compose.app.yml` follow the platform contra
 - `logging.enabled=true`
 - `logging.stack=vion`
 - `logging.service=vion-arena-backend`
+
+If the shared platform provisioning from `docs/platform/observability.md` is present, Grafana also includes persistent dashboards for this app:
+
+- `Vion Arena App Health`
+- `Vion Arena Containers & Platform Health`
 
 Useful checks after deployment:
 
@@ -150,6 +159,7 @@ sh scripts/smoke-test.sh
 - If Prometheus does not scrape the backend, check the Docker labels and confirm `/metrics` is reachable inside the container on port `8000`.
 - If leaderboard submissions fail from the browser, confirm `APP_ALLOWED_ORIGINS` includes the frontend origin.
 - If Jenkins can build but cannot deploy, verify it can access the same Docker daemon and that the target networks already exist.
+- If `npm ci` fails inside the Jenkins frontend check even though `package-lock.json` exists in the repo, verify the pipeline still uses `--volumes-from "$HOSTNAME"` for its helper containers.
 - If smoke tests fail on hostnames, use `curl -H 'Host: ...' http://localhost/...` or add local DNS entries for `arena.vion.test` and `api.arena.vion.test`.
 
 ## Scope Guardrails

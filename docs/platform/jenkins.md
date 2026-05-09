@@ -4,7 +4,7 @@ Jenkins is the CI/CD orchestrator in this stack.
 
 ## Current Service Definition
 
-- image: `jenkins/jenkins:lts-jdk17`
+- image: `localhost:5000/vion/jenkins-docker:lts-jdk17`
 - route: `jenkins.vion.test`
 - direct host port: `8081`
 - persistent volume: `jenkins-home`
@@ -12,6 +12,15 @@ Jenkins is the CI/CD orchestrator in this stack.
 - mounts `/var/run/docker.sock`
 
 The Docker socket mount lets Jenkins build images and run Docker commands on the host daemon.
+
+The image itself is built from `jenkins/jenkins:lts-jdk17` and preinstalls:
+
+- Docker CLI
+- Docker Compose v2 plugin
+
+The custom image is pushed into the local registry through its directly published Docker endpoint on `localhost:5000`.
+
+Because Jenkins talks to the host Docker daemon through `/var/run/docker.sock`, helper containers launched from Jenkins jobs should not assume that container-internal paths can be safely bind-mounted with `-v "$PWD":...`. If a pipeline needs to share the Jenkins workspace with a helper container, a shared-volume pattern such as `--volumes-from "$HOSTNAME"` is more reliable.
 
 ## Why It Exists In This Stack
 
@@ -59,13 +68,13 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'docker build -t registry.game.test/game-api:${BUILD_NUMBER} .'
+        sh 'docker build -t localhost:5000/game-api:${BUILD_NUMBER} .'
       }
     }
 
     stage('Push') {
       steps {
-        sh 'docker push registry.game.test/game-api:${BUILD_NUMBER}'
+        sh 'docker push localhost:5000/game-api:${BUILD_NUMBER}'
       }
     }
   }

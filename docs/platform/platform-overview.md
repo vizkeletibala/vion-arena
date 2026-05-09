@@ -20,10 +20,12 @@ The platform stack provides:
 The active runtime config lives in:
 
 - `docker-compose.yaml`
+- `platform-stack/jenkins/Dockerfile`
 - `platform-stack/prometheus/prometheus.yaml`
 - `platform-stack/promtail/promtail-config.yaml`
 - `platform-stack/loki/loki-config.yaml`
 - `platform-stack/grafana/provisioning/datasources/datasources.yaml`
+- `platform-stack/grafana/provisioning/dashboards/dashboards.yaml`
 
 This docs folder mirrors those decisions in a format that is easier for another session to understand and transplant.
 
@@ -32,7 +34,7 @@ This docs folder mirrors those decisions in a format that is easier for another 
 | Service | Role | Main Access |
 | --- | --- | --- |
 | Traefik | Reverse proxy and router | `http://traefik.vion.test` and `http://localhost:8080` |
-| Registry | Docker image registry | `http://registry.localhost` |
+| Registry | Docker image registry | `http://registry.localhost` and `localhost:5000` |
 | Jenkins | CI/CD server | `http://jenkins.vion.test` and `http://localhost:8081` |
 | Prometheus | Metrics backend | `http://localhost:9090` |
 | Grafana | Dashboards and logs | `http://grafana.vion.test` and `http://localhost:3000` |
@@ -91,6 +93,9 @@ For a game project, this stack can stay mostly unchanged. The main work is to:
 ## Important Notes
 
 - Grafana is pre-provisioned to talk to Prometheus and Loki through internal Docker DNS.
+- Grafana also provisions persistent dashboards from files under `platform-stack/grafana/provisioning/dashboards/`.
 - Jenkins has access to `/var/run/docker.sock`, so it can build and run Docker workloads on the host.
+- Jenkins uses a custom image based on `jenkins/jenkins:lts-jdk17` with Docker CLI and Docker Compose plugin preinstalled.
+- When Jenkins launches helper containers against the host Docker daemon, container-internal paths should not be bind-mounted with `-v "$PWD":...`; shared-volume approaches such as `--volumes-from` are safer.
 - The registry currently has no auth or TLS in this local stack.
 - The routing setup mixes `*.vion.test` with `registry.localhost`; see `routing.md` and `registry.md` for the implication.

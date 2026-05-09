@@ -23,7 +23,8 @@ docker compose --profile dns up -d dnsmasq
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3000` or `http://grafana.vion.test`
 - cAdvisor: `http://localhost:8083` or `http://cadvisor.vion.test`
-- Registry: `http://registry.localhost`
+- Registry HTTP route: `http://registry.localhost`
+- Registry Docker endpoint: `localhost:5000`
 
 ## DNS Strategy
 
@@ -44,6 +45,8 @@ Grafana defaults:
 ```text
 admin / admin
 ```
+
+If Grafana has already been initialized and the password was changed, the live login comes from the persistent `grafana-data` volume rather than the compose defaults.
 
 Jenkins first-run setup is still enabled, so expect manual bootstrap in a fresh environment.
 
@@ -68,6 +71,7 @@ docker compose logs --tail=100 promtail
 docker compose logs --tail=100 traefik
 curl -sS http://localhost:9090/-/ready
 curl -sS http://localhost:3000/api/health
+docker exec -u root vion-project-grafana-1 grafana cli admin reset-admin-password NEW_PASSWORD
 ```
 
 ## Recommended Adaptation For A Game Repo

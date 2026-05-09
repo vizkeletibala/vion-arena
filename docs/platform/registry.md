@@ -6,6 +6,7 @@ The stack includes a local Docker Registry service for storing built images clos
 
 - image: `registry:2`
 - routed hostname: `registry.localhost`
+- direct Docker endpoint: `localhost:5000`
 - internal app port: `5000`
 - debug and metrics port: `5001`
 - persistent volume: `registry-data`
@@ -34,6 +35,14 @@ The service is exposed through Traefik with:
 - traefik.http.services.registry.loadbalancer.server.port=5000
 ```
 
+It is also published directly on the host as:
+
+```text
+localhost:5000
+```
+
+That direct port is the reliable endpoint for `docker push` and `docker pull` on this machine.
+
 The registry is also labeled for:
 
 - logging through Promtail
@@ -44,19 +53,19 @@ The registry is also labeled for:
 Build and tag:
 
 ```bash
-docker build -t registry.localhost/my-team/game-api:dev .
+docker build -t localhost:5000/my-team/game-api:dev .
 ```
 
 Push:
 
 ```bash
-docker push registry.localhost/my-team/game-api:dev
+docker push localhost:5000/my-team/game-api:dev
 ```
 
 Use in Compose:
 
 ```yaml
-image: registry.localhost/my-team/game-api:dev
+image: localhost:5000/my-team/game-api:dev
 ```
 
 ## Reusing This In A Game Repo
@@ -72,6 +81,8 @@ Suggested hostname normalization for a new repo:
 - `registry.game.test`
 
 That would better match the wildcard DNS pattern used by the other services.
+
+If you do normalize the hostname in another repo, it is still worth keeping a direct host port for Docker CLI use unless you are also setting up a DNS name that Docker can reliably resolve on every machine.
 
 ## Important Security Note
 
