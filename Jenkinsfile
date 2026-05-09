@@ -8,8 +8,8 @@ pipeline {
     BACKEND_IMAGE = "${REGISTRY}/vion-arena-backend:${IMAGE_TAG}"
     APP_HOST = "arena.vion.test"
     API_HOST = "api.arena.vion.test"
-    EDGE_NETWORK = "edge"
-    INTERNAL_NETWORK = "internal"
+    EDGE_NETWORK = "vion-project_edge"
+    INTERNAL_NETWORK = "vion-project_internal"
   }
 
   stages {
