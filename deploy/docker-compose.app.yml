@@ -1,0 +1,48 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-registry.localhost/vion-arena-backend:dev}
+    restart: unless-stopped
+    environment:
+      APP_NAME: vion-arena-backend
+      APP_VERSION: ${APP_VERSION:-dev}
+      APP_ALLOWED_ORIGINS: ${APP_ALLOWED_ORIGINS:-http://arena.vion.test}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vion-arena-api.rule=Host(`${ARENA_API_HOST:-api.arena.vion.test}`)
+      - traefik.http.routers.vion-arena-api.entrypoints=web
+      - traefik.http.services.vion-arena-api.loadbalancer.server.port=8000
+      - logging.enabled=true
+      - logging.stack=vion
+      - logging.service=vion-arena-backend
+      - prometheus.scrape=true
+      - prometheus.port=8000
+      - prometheus.path=/metrics
+    networks:
+      - edge
+      - internal
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-registry.localhost/vion-arena-frontend:dev}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vion-arena.rule=Host(`${ARENA_HOST:-arena.vion.test}`)
+      - traefik.http.routers.vion-arena.entrypoints=web
+      - traefik.http.services.vion-arena.loadbalancer.server.port=80
+      - logging.enabled=true
+      - logging.stack=vion
+      - logging.service=vion-arena-frontend
+    networks:
+      - edge
+      - internal
+
+networks:
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:-edge}
+  internal:
+    external: true
+    name: ${INTERNAL_NETWORK:-internal}
+

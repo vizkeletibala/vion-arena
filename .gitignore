@@ -37,3 +37,6 @@ tmp/
 .env
 .env.*
 !.env.example
+
+frontend/vite.config.js
+frontend/vite.config.d.ts
