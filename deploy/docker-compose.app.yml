@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ${BACKEND_IMAGE:-registry.localhost/vion-arena-backend:dev}
+    image: ${BACKEND_IMAGE:-localhost:5000/vion-arena-backend:dev}
     restart: unless-stopped
     environment:
       APP_NAME: vion-arena-backend
@@ -22,7 +22,7 @@ services:
       - internal
 
   frontend:
-    image: ${FRONTEND_IMAGE:-registry.localhost/vion-arena-frontend:dev}
+    image: ${FRONTEND_IMAGE:-localhost:5000/vion-arena-frontend:dev}
     restart: unless-stopped
     depends_on:
       - backend
@@ -45,4 +45,3 @@ networks:
   internal:
     external: true
     name: ${INTERNAL_NETWORK:-internal}
-

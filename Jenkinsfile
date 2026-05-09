@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     IMAGE_TAG = "${BUILD_NUMBER}"
-    REGISTRY = "registry.localhost"
+    REGISTRY = "localhost:5000"
     FRONTEND_IMAGE = "${REGISTRY}/vion-arena-frontend:${IMAGE_TAG}"
     BACKEND_IMAGE = "${REGISTRY}/vion-arena-backend:${IMAGE_TAG}"
     APP_HOST = "arena.vion.test"
@@ -17,8 +17,8 @@ pipeline {
       steps {
         sh '''
           docker run --rm \
-            -v "$PWD":/workspace \
-            -w /workspace/frontend \
+            --volumes-from "$HOSTNAME" \
+            -w "$PWD/frontend" \
             node:20-alpine \
             sh -lc "npm ci && npm run lint && npm run test && npm run build"
         '''
@@ -29,8 +29,8 @@ pipeline {
       steps {
         sh '''
           docker run --rm \
-            -v "$PWD":/workspace \
-            -w /workspace/backend \
+            --volumes-from "$HOSTNAME" \
+            -w "$PWD/backend" \
             python:3.12-slim \
             sh -lc "pip install --no-cache-dir -r requirements-dev.txt && python -m ruff check app tests && pytest"
         '''
@@ -74,8 +74,8 @@ pipeline {
         sh '''
           docker run --rm \
             --network host \
-            -v "$PWD":/workspace \
-            -w /workspace \
+            --volumes-from "$HOSTNAME" \
+            -w "$PWD" \
             alpine:3.20 \
             sh -lc "apk add --no-cache curl grep >/dev/null && TRAEFIK_URL=http://localhost APP_HOST=$APP_HOST API_HOST=$API_HOST sh scripts/smoke-test.sh"
         '''
