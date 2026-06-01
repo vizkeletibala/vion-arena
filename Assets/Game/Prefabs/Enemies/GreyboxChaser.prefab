@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 100005}
   - component: {fileID: 100006}
   - component: {fileID: 100007}
+  - component: {fileID: 100008}
   m_Layer: 0
   m_Name: GreyboxChaser
   m_TagString: Untagged
@@ -96,3 +97,16 @@ MonoBehaviour:
       m_Calls: []
   destroyOnDeath: 1
   destroyDelay: 0.15
+--- !u!114 &100008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: LootDropper
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Loot.LootDropper
+  lootTable: {fileID: 11400000, guid: 32e5522f71164d2c95e2dd17b3f81abc, type: 2}
+  pickupPrefab: {fileID: 100003, guid: 33e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  dropOrigin: {fileID: 100001}
+  dropOffset: {x: 0, y: 0.25, z: 0}
