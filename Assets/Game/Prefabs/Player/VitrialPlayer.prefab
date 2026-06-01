@@ -1,0 +1,149 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 100001}
+  - component: {fileID: 100002}
+  - component: {fileID: 100003}
+  - component: {fileID: 100004}
+  - component: {fileID: 100005}
+  - component: {fileID: 100006}
+  m_Layer: 0
+  m_Name: VitrialPlayer
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &100001
+Transform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 100101}
+  - {fileID: 100201}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &100002
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.8
+  m_Radius: 0.32
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &100003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1f5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: PlayerInputReader
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Player.PlayerInputReader
+  readMouse: 1
+--- !u!114 &100004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2f5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: PlayerMotor
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Player.PlayerMotor
+  walkSpeed: 5.5
+  sprintSpeed: 8.5
+  acceleration: 18
+  jumpHeight: 1.35
+  gravity: -24
+  groundedStickForce: -2
+--- !u!114 &100005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: PlayerLookController
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Player.PlayerLookController
+  cameraPivot: {fileID: 100101}
+  mouseSensitivity: 2.5
+  minPitch: -80
+  maxPitch: 80
+  lockCursorOnStart: 1
+--- !u!114 &100006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4f5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: PlayerRigAnchor
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Player.PlayerRigAnchor
+  cameraPivot: {fileID: 100101}
+  weaponSocket: {fileID: 100201}
+  inputReader: {fileID: 100003}
+  motor: {fileID: 100004}
+  lookController: {fileID: 100005}
+--- !u!1 &100100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_Component:
+  - component: {fileID: 100101}
+  - component: {fileID: 100102}
+  m_Layer: 0
+  m_Name: CameraPivot
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &100101
+Transform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100100}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.62, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 100001}
+--- !u!20 &100102
+Camera:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100100}
+  m_Enabled: 1
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.18, g: 0.2, b: 0.23, a: 0}
+  m_FieldOfView: 70
+  m_NearClipPlane: 0.03
+  m_FarClipPlane: 1000
+  m_Depth: -1
+--- !u!1 &100200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_Component:
+  - component: {fileID: 100201}
+  m_Layer: 0
+  m_Name: WeaponSocket
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &100201
+Transform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100200}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.35, y: 1.35, z: 0.55}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 100001}
