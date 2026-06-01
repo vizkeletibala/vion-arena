@@ -1,0 +1,114 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &900000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 900001}
+  - component: {fileID: 900002}
+  - component: {fileID: 900003}
+  - component: {fileID: 900004}
+  - component: {fileID: 900005}
+  - component: {fileID: 900006}
+  - component: {fileID: 900007}
+  m_Layer: 5
+  m_Name: GreyboxHud
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &900001
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &900002
+Canvas:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_PixelPerfect: 0
+  m_SortingOrder: 10
+  m_TargetDisplay: 0
+--- !u!114 &900003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b83f8c939c8b4d4c80f7f5a732f4bc2, type: 3}
+  m_Name: CanvasScaler
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
+  m_UiScaleMode: 1
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0.5
+--- !u!114 &900004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9fa1d3f1597d4e47a8f5eab7f48106a, type: 3}
+  m_Name: GraphicRaycaster
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+--- !u!114 &900005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: HudView
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.UI.HudView
+  healthText: {fileID: 0}
+  ammoText: {fileID: 0}
+  reloadText: {fileID: 0}
+  health: {fileID: 0}
+  weapon: {fileID: 0}
+--- !u!114 &900006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: PickupPromptView
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.UI.PickupPromptView
+  promptText: {fileID: 0}
+  promptGroup: {fileID: 0}
+  promptFormat: Pick up {0}
+  autoClearSeconds: 1.75
+--- !u!114 &900007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 900000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: InventoryComparisonView
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.UI.InventoryComparisonView
+  inventoryPanel: {fileID: 0}
+  titleText: {fileID: 0}
+  slotsText: {fileID: 0}
+  comparisonText: {fileID: 0}
+  controlsText: {fileID: 0}
+  inventory: {fileID: 0}
+  inputReader: {fileID: 0}
+  controlHints: Tab Inventory | Up/Down Select | Enter/E Equip

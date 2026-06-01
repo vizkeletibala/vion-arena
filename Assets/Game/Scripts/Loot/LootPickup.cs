@@ -1,4 +1,5 @@
 using Vitrial.Inventory;
+using Vitrial.UI;
 using UnityEngine;
 
 namespace Vitrial.Loot
@@ -38,9 +39,23 @@ namespace Vitrial.Loot
             }
 
             PlayerInventory inventory = other.GetComponentInParent<PlayerInventory>();
+            if (inventory != null)
+            {
+                PickupPromptView.Active?.SetPrompt(this);
+            }
+
             if (inventory != null && inventory.AddItem(itemInstance))
             {
+                PickupPromptView.Active?.SetPrompt($"Picked up {itemInstance.DisplayName}");
                 Destroy(gameObject);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.GetComponentInParent<PlayerInventory>() != null)
+            {
+                PickupPromptView.Active?.ClearPrompt();
             }
         }
     }
