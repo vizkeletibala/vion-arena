@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: GreyboxChaser
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.Enemies.EnemyDefinition
+  displayName: Greybox Chaser
+  prefab: {fileID: 100000, guid: 16e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  maxHealth: 50
+  moveSpeed: 3.25
+  detectRange: 18
+  attackRange: 1.35
+  contactDamage: 10
+  attackCooldown: 0.75

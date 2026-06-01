@@ -9,22 +9,48 @@ namespace Vitrial.Enemies
         [SerializeField] private float maxHealth = 50f;
 
         private float currentHealth;
+        private bool initialized;
 
         public event Action<DamagePayload> Damaged;
         public event Action Died;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
-        public bool IsDead => currentHealth <= 0f;
+        public bool IsDead => initialized && currentHealth <= 0f;
 
         private void Awake()
         {
-            currentHealth = maxHealth;
+            ResetHealth();
+        }
+
+        public void SetMaxHealth(float value, bool resetCurrent = true)
+        {
+            maxHealth = Mathf.Max(1f, value);
+
+            if (resetCurrent || !initialized)
+            {
+                ResetHealth();
+            }
+            else
+            {
+                currentHealth = Mathf.Min(currentHealth, maxHealth);
+            }
+        }
+
+        public void ResetHealth()
+        {
+            currentHealth = Mathf.Max(1f, maxHealth);
+            initialized = true;
         }
 
         public void ApplyDamage(DamagePayload payload)
         {
-            if (IsDead)
+            if (!initialized)
+            {
+                ResetHealth();
+            }
+
+            if (IsDead || payload.Amount <= 0f)
             {
                 return;
             }
