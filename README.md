@@ -46,7 +46,24 @@ The Vite app expects the backend at `http://localhost:8000` by default. Override
 
 Unity greybox prototype work lives under `Assets/Game/`. Open the repository root in Unity 2022.3 LTS on Windows; the EC2 host is only used for source validation, Jenkins orchestration, Docker packaging, and future dedicated-server deployment, not to run the Unity Editor.
 
-Canonical Milestone 1 scene path: `Assets/Game/Scenes/PrototypeArena.unity`. Create that scene in the Unity Editor, then commit Unity-generated `.unity`, `.meta`, and intentional ProjectSettings changes. See `docs/vitrial-unity.md` for folder conventions and handoff notes, and `docs/vitrial-automation.md` for the EC2/Jenkins/server automation boundary.
+Canonical Milestone 1 scene path: `Assets/Game/Scenes/PrototypeArena.unity`. The scene is a hand-authored greybox slice that wires together `VitrialPlayer`, `StarterRifle`, `GreyboxChaser`, loot drops, pickup/inventory UI, and a scene restart loop. See `docs/vitrial-unity.md` for folder conventions and handoff notes, and `docs/vitrial-automation.md` for the EC2/Jenkins/server automation boundary.
+
+#### Windows Milestone 1 playtest
+
+1. Install Unity Hub and Unity Editor `2022.3.55f1` or another 2022.3 LTS patch. If Unity Hub updates the patch version, let it update `ProjectSettings/ProjectVersion.txt` and review the diff before committing.
+2. Open this repository root as the Unity project. Do not open `frontend/` or `backend/` as the Unity project; those remain the pre-existing browser-game stack.
+3. In the Project window open `Assets/Game/Scenes/PrototypeArena.unity`.
+4. Press Play. If Unity asks to import/normalize assets, allow it, then save intentional `.unity`, `.prefab`, `.asset`, `.meta`, and ProjectSettings changes only.
+5. Validate the loop:
+   - WASD moves, mouse looks, Left Shift sprints, and Space jumps.
+   - Left Mouse fires the starter rifle, R reloads, and the HUD updates ammo/reload state.
+   - The GreyboxChaser spawns, chases the Player-tag object, takes rifle damage, dies, and drops loot.
+   - Walking through loot shows the pickup prompt, adds the item to inventory, and equips the first weapon pickup.
+   - Tab opens inventory comparison, Up/Down changes selection, and Enter or E equips the selected item.
+   - Let the enemy kill the player to verify the scene restarts after the death delay; Backspace manually restarts the scene for repeated playtest passes.
+6. Stop Play Mode before committing; never commit `Library/`, `Temp/`, `Obj/`, `Build/`, `Builds/`, or user-local Unity settings.
+
+Windows-only validation is intentionally left to Andrew because the EC2 host used by agents does not have the Unity Editor or graphics stack. Headless checks available on EC2 are source/structure checks such as `sh scripts/validate-vitrial-headless.sh`, `python3 -m pytest tests/test_unity_player_lane.py tests/test_unity_weapon_lane.py tests/test_unity_enemy_lane.py tests/test_unity_loot_inventory_lane.py tests/test_unity_ui_lane.py tests/test_unity_milestone1_integration.py -q`, JSON validation for `Packages/manifest.json` and `Assets/Game/Vitrial.Game.asmdef`, and `git diff --check`.
 
 ### Backend
 

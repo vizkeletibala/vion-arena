@@ -39,13 +39,14 @@ Future Linux server packaging and deployment skeletons live in:
 
 ## Windows/Unity Editor follow-up
 
-This scaffold was created on a headless EC2 host and does not require the Unity Editor here. On Windows:
+This Milestone 1 slice was assembled on a headless EC2 host and still requires Unity Editor validation on Windows. On Windows:
 
 1. Install/open with Unity 2022.3 LTS. If Andrew standardizes on a different 2022.3 patch, let Unity update `ProjectSettings/ProjectVersion.txt`.
 2. Open the repository root as the Unity project.
-3. Create and save the canonical scene at `Assets/Game/Scenes/PrototypeArena.unity`.
-4. Let Unity generate `.meta` files for imported assets and commit them with the scene/prefab/data assets they belong to.
-5. Keep `Library/`, `Temp/`, `Obj/`, `Build/`, `Builds/`, and user-local settings out of git.
+3. Open the canonical scene at `Assets/Game/Scenes/PrototypeArena.unity` and press Play.
+4. Verify movement/look/sprint/jump, starter rifle fire/reload, enemy death, loot pickup, inventory/equip UI, and the death/manual restart loop documented in the top-level README.
+5. Let Unity generate or normalize `.meta` files for imported assets and commit only intentional scene/prefab/data/settings changes.
+6. Keep `Library/`, `Temp/`, `Obj/`, `Build/`, `Builds/`, and user-local settings out of git.
 
 ## Architecture notes
 

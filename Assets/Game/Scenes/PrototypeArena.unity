@@ -20,6 +20,7 @@ GameObject:
   m_ObjectHideFlags: 0
   m_Component:
   - component: {fileID: 1001}
+  - component: {fileID: 1002}
   m_Layer: 0
   m_Name: PrototypeArena
   m_TagString: Untagged
@@ -38,6 +39,18 @@ Transform:
   - {fileID: 5001}
   - {fileID: 6001}
   m_Father: {fileID: 0}
+--- !u!114 &1002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66e5522f71164d2c95e2dd17b3f81abc, type: 3}
+  m_Name: MatchLoopController
+  m_EditorClassIdentifier: Vitrial.Game::Vitrial.GameState.MatchLoopController
+  playerHealth: {fileID: 0}
+  manualRestartKey: 8
+  restartDelaySeconds: 2.5
 --- !u!1 &2000
 GameObject:
   m_ObjectHideFlags: 0
