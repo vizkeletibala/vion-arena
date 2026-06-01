@@ -16,11 +16,14 @@ Vion Arena is a small 2D browser game built to exercise a local DevOps platform.
 ## Repository Layout
 
 ```text
-frontend/   React + TypeScript + Vite canvas client
-backend/    FastAPI API, in-memory score store, tests, metrics, logs
-deploy/     Application compose file for the shared platform
-docs/       Platform notes copied from the original stack
-scripts/    Smoke-test helper used by Jenkins
+frontend/        React + TypeScript + Vite canvas client
+backend/         FastAPI API, in-memory score store, tests, metrics, logs
+Assets/Game/     Unity Vitrial greybox prototype source lane
+Packages/        Minimal Unity package manifest for opening the repo as a project
+ProjectSettings/ Minimal Unity project metadata; Unity fills this out on Windows
+deploy/          Application compose file for the shared platform
+docs/            Platform notes plus Unity scaffold notes
+scripts/         Smoke-test helper used by Jenkins
 ```
 
 ## Local Development
@@ -37,6 +40,12 @@ npm run dev -- --host 0.0.0.0
 ```
 
 The Vite app expects the backend at `http://localhost:8000` by default. Override it with `VITE_API_BASE_URL`.
+
+### Unity / Vitrial
+
+Unity greybox prototype work lives under `Assets/Game/`. Open the repository root in Unity 2022.3 LTS on Windows; the EC2 host is only used to prepare source files and documentation, not to run the Unity Editor.
+
+Canonical Milestone 1 scene path: `Assets/Game/Scenes/PrototypeArena.unity`. Create that scene in the Unity Editor, then commit Unity-generated `.unity`, `.meta`, and intentional ProjectSettings changes. See `docs/vitrial-unity.md` for folder conventions and handoff notes.
 
 ### Backend
 

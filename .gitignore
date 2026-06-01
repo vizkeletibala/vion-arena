@@ -38,5 +38,28 @@ tmp/
 .env.*
 !.env.example
 
+# Unity generated/cache artifacts
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+Recordings/
+.vs/
+*.csproj
+*.sln
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+sysinfo.txt
+
 frontend/vite.config.js
 frontend/vite.config.d.ts
