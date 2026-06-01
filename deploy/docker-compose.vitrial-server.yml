@@ -1,0 +1,31 @@
+services:
+  vitrial-server:
+    image: ${VITRIAL_SERVER_IMAGE:-localhost:5000/vitrial-server:dev}
+    profiles:
+      - vitrial-server
+    restart: unless-stopped
+    environment:
+      VITRIAL_SERVER_PORT: ${VITRIAL_SERVER_PORT:-7777}
+      VITRIAL_METRICS_PORT: ${VITRIAL_METRICS_PORT:-9100}
+      VITRIAL_LOG_FORMAT: json
+      VITRIAL_EXTRA_ARGS: ${VITRIAL_EXTRA_ARGS:-}
+    # Keep the prototype server internal by default. When a secured public lane
+    # exists, expose the UDP game port deliberately at the host/firewall layer.
+    expose:
+      - "7777/udp"
+      - "9100/tcp"
+    labels:
+      - traefik.enable=false
+      - logging.enabled=true
+      - logging.stack=vion
+      - logging.service=vitrial-server
+      - prometheus.scrape=${VITRIAL_PROMETHEUS_SCRAPE:-false}
+      - prometheus.port=9100
+      - prometheus.path=/metrics
+    networks:
+      - internal
+
+networks:
+  internal:
+    external: true
+    name: ${INTERNAL_NETWORK:-vion-project_internal}

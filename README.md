@@ -11,7 +11,8 @@ Vion Arena is a small 2D browser game built to exercise a local DevOps platform.
 - Backend pytest coverage for health, version, scores, and metrics
 - Dockerfiles for both services
 - `deploy/docker-compose.app.yml` for a platform that already runs Traefik, Jenkins, registry, Prometheus, Grafana, Loki, Promtail, cAdvisor, and node-exporter
-- A Jenkins pipeline that tests, builds, pushes, deploys, and smoke-tests the app
+- `deploy/Dockerfile.vitrial-server` and `deploy/docker-compose.vitrial-server.yml` as gated placeholders for a future Unity Linux dedicated server
+- A Jenkins pipeline that tests, builds, pushes, deploys, and smoke-tests the current app while keeping future Unity server packaging disabled until Unity build artifacts exist
 
 ## Repository Layout
 
@@ -21,9 +22,9 @@ backend/         FastAPI API, in-memory score store, tests, metrics, logs
 Assets/Game/     Unity Vitrial greybox prototype source lane
 Packages/        Minimal Unity package manifest for opening the repo as a project
 ProjectSettings/ Minimal Unity project metadata; Unity fills this out on Windows
-deploy/          Application compose file for the shared platform
-docs/            Platform notes plus Unity scaffold notes
-scripts/         Smoke-test helper used by Jenkins
+deploy/          Application compose file plus future Vitrial server Docker/Compose skeleton
+docs/            Platform notes plus Unity scaffold and EC2 automation notes
+scripts/         Smoke-test and headless scaffold validation helpers
 ```
 
 ## Local Development
@@ -43,9 +44,9 @@ The Vite app expects the backend at `http://localhost:8000` by default. Override
 
 ### Unity / Vitrial
 
-Unity greybox prototype work lives under `Assets/Game/`. Open the repository root in Unity 2022.3 LTS on Windows; the EC2 host is only used to prepare source files and documentation, not to run the Unity Editor.
+Unity greybox prototype work lives under `Assets/Game/`. Open the repository root in Unity 2022.3 LTS on Windows; the EC2 host is only used for source validation, Jenkins orchestration, Docker packaging, and future dedicated-server deployment, not to run the Unity Editor.
 
-Canonical Milestone 1 scene path: `Assets/Game/Scenes/PrototypeArena.unity`. Create that scene in the Unity Editor, then commit Unity-generated `.unity`, `.meta`, and intentional ProjectSettings changes. See `docs/vitrial-unity.md` for folder conventions and handoff notes.
+Canonical Milestone 1 scene path: `Assets/Game/Scenes/PrototypeArena.unity`. Create that scene in the Unity Editor, then commit Unity-generated `.unity`, `.meta`, and intentional ProjectSettings changes. See `docs/vitrial-unity.md` for folder conventions and handoff notes, and `docs/vitrial-automation.md` for the EC2/Jenkins/server automation boundary.
 
 ### Backend
 
@@ -120,16 +121,18 @@ docker compose -f deploy/docker-compose.app.yml up -d
 
 ## Jenkins Pipeline
 
-`Jenkinsfile` is designed for the local Jenkins described in `docs/platform/jenkins.md`.
+`Jenkinsfile` is designed for the local Jenkins described in `docs/platform/jenkins.md`. It now has an explicit split between checks that can run headlessly on EC2 today and Unity/server work that must wait for licensed Unity build output. See `docs/vitrial-automation.md` for the full Vitrial automation and dedicated-server plan.
 
 Pipeline stages:
 
-1. Run frontend checks in a Node container
-2. Run backend linting and pytest in a Python container
-3. Build Docker images
-4. Push images to `localhost:5000`
-5. Deploy with `deploy/docker-compose.app.yml`
-6. Run `scripts/smoke-test.sh`
+1. Run Vitrial headless scaffold checks in a Python container
+2. Run frontend checks in a Node container
+3. Run backend linting and pytest in a Python container
+4. Build Docker images for the current app
+5. Push images to `localhost:5000`
+6. Optionally build/push/deploy a future Unity Linux dedicated-server image when `ENABLE_UNITY_SERVER_BUILD=true` and `Builds/LinuxServer/VitrialServer.x86_64` exists
+7. Deploy the current app with `deploy/docker-compose.app.yml`
+8. Run `scripts/smoke-test.sh`
 
 Because Jenkins has Docker socket access, it can run the pipeline without installing Node or Python on the agent itself.
 
@@ -138,6 +141,8 @@ The pipeline uses `--volumes-from "$HOSTNAME"` for the temporary test containers
 ## Observability
 
 Backend logs are emitted as structured JSON on stdout so Promtail and Loki can ingest them without extra parsing work. The backend also exposes Prometheus metrics at `/metrics`.
+
+The future Vitrial dedicated server should follow the same Vion stack contracts: structured JSON logs on stdout for Loki/Promtail, `logging.*` Docker labels in `deploy/docker-compose.vitrial-server.yml`, and a real `/metrics` endpoint before `VITRIAL_PROMETHEUS_SCRAPE=true` is enabled. The server compose profile is internal-only by default and has `traefik.enable=false` so dashboards/admin surfaces are not accidentally exposed without auth/TLS.
 
 Application labels in `deploy/docker-compose.app.yml` follow the platform contracts from `docs/platform/observability.md`:
 

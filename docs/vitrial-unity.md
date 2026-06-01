@@ -21,6 +21,22 @@ This repository now has a Unity lane alongside the existing browser-game stack.
 - Match state: `Assets/Game/Scripts/GameState/`
 - Future server-authoritative seams: `Assets/Game/Scripts/Networking/`
 
+## EC2/Jenkins automation boundary
+
+The EC2/Vion stack lane may run source-level checks, Docker packaging, Jenkins orchestration, Docker Compose deployment, and Loki/Grafana/Prometheus integration. It must not become a Milestone 1 gate for Unity Editor import, C# compilation, scene validation, or Linux dedicated-server build generation until Unity licensing/tooling is explicitly available there.
+
+Current headless validation entrypoint:
+
+```bash
+sh scripts/validate-vitrial-headless.sh
+```
+
+Future Linux server packaging and deployment skeletons live in:
+
+- `deploy/Dockerfile.vitrial-server`
+- `deploy/docker-compose.vitrial-server.yml`
+- `docs/vitrial-automation.md`
+
 ## Windows/Unity Editor follow-up
 
 This scaffold was created on a headless EC2 host and does not require the Unity Editor here. On Windows:

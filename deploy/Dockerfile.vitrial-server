@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+
+# Placeholder runtime image for a future Unity Linux dedicated-server build.
+# This intentionally expects Unity/Windows or licensed Unity Builder output to
+# already exist under Builds/LinuxServer; Milestone 1 EC2 automation must not
+# pretend it can create that binary without Unity licensing/tooling.
+FROM ubuntu:24.04 AS runtime
+
+ARG SERVER_BUILD_DIR=Builds/LinuxServer
+ARG SERVER_BINARY=VitrialServer.x86_64
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/vitrial-server
+COPY ${SERVER_BUILD_DIR}/ ./
+
+RUN test -f "${SERVER_BINARY}" \
+    && chmod +x "${SERVER_BINARY}" \
+    || (echo "Expected Unity Linux server binary ${SERVER_BUILD_DIR}/${SERVER_BINARY}; produce it on the licensed Unity build lane before enabling this Docker build." >&2; exit 1)
+
+ENV SERVER_BINARY=${SERVER_BINARY} \
+    VITRIAL_SERVER_PORT=7777 \
+    VITRIAL_METRICS_PORT=9100 \
+    VITRIAL_LOG_FORMAT=json
+
+EXPOSE 7777/udp 9100/tcp
+ENTRYPOINT ["/bin/sh", "-lc", "./${SERVER_BINARY} -batchmode -nographics -serverPort ${VITRIAL_SERVER_PORT} ${VITRIAL_EXTRA_ARGS:-}"]

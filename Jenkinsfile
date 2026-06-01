@@ -6,13 +6,29 @@ pipeline {
     REGISTRY = "localhost:5000"
     FRONTEND_IMAGE = "${REGISTRY}/vion-arena-frontend:${IMAGE_TAG}"
     BACKEND_IMAGE = "${REGISTRY}/vion-arena-backend:${IMAGE_TAG}"
+    VITRIAL_SERVER_IMAGE = "${REGISTRY}/vitrial-server:${IMAGE_TAG}"
     APP_HOST = "arena.vion.test"
     API_HOST = "api.arena.vion.test"
     EDGE_NETWORK = "vion-project_edge"
     INTERNAL_NETWORK = "vion-project_internal"
+    ENABLE_UNITY_SERVER_BUILD = "false"
+    UNITY_SERVER_BUILD_DIR = "Builds/LinuxServer"
+    UNITY_SERVER_BINARY = "VitrialServer.x86_64"
   }
 
   stages {
+    stage('Vitrial Headless Scaffold Checks') {
+      steps {
+        sh '''
+          docker run --rm \
+            --volumes-from "$HOSTNAME" \
+            -w "$PWD" \
+            python:3.12-slim \
+            sh scripts/validate-vitrial-headless.sh
+        '''
+      }
+    }
+
     stage('Frontend Checks') {
       steps {
         sh '''
@@ -51,6 +67,36 @@ pipeline {
         sh '''
           docker push "$BACKEND_IMAGE"
           docker push "$FRONTEND_IMAGE"
+        '''
+      }
+    }
+
+    stage('Build Future Unity Server Image') {
+      when {
+        expression { env.ENABLE_UNITY_SERVER_BUILD == 'true' }
+      }
+      steps {
+        sh '''
+          test -f "$UNITY_SERVER_BUILD_DIR/$UNITY_SERVER_BINARY"
+          docker build \
+            --build-arg SERVER_BUILD_DIR="$UNITY_SERVER_BUILD_DIR" \
+            --build-arg SERVER_BINARY="$UNITY_SERVER_BINARY" \
+            -t "$VITRIAL_SERVER_IMAGE" \
+            -f deploy/Dockerfile.vitrial-server .
+          docker push "$VITRIAL_SERVER_IMAGE"
+        '''
+      }
+    }
+
+    stage('Deploy Future Unity Server') {
+      when {
+        expression { env.ENABLE_UNITY_SERVER_BUILD == 'true' }
+      }
+      steps {
+        sh '''
+          VITRIAL_SERVER_IMAGE="$VITRIAL_SERVER_IMAGE" \
+          INTERNAL_NETWORK="$INTERNAL_NETWORK" \
+          docker compose -f deploy/docker-compose.vitrial-server.yml --profile vitrial-server up -d
         '''
       }
     }
