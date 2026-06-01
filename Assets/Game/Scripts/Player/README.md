@@ -18,6 +18,7 @@ The controller uses Unity's built-in legacy input axes (`Horizontal`, `Vertical`
 - `PlayerMotor` owns `CharacterController` movement, sprint speed, jumping, and gravity.
 - `PlayerLookController` rotates the player yaw and `CameraPivot` pitch.
 - `PlayerRigAnchor` exposes stable scene hooks: `CameraPivot`, `WeaponSocket`, `InputReader`, `Motor`, and `LookController`.
+- The `WeaponSocket` mounts the Starter Rifle child; fire with Left Mouse Button and reload with `reload: R`.
 
 ## Downstream input contract
 
