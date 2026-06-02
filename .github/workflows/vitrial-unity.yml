@@ -1,0 +1,195 @@
+name: Vitrial Unity CI
+
+on:
+  push:
+    branches:
+      - main
+      - VA-V1
+      - ci-actions
+    paths:
+      - "Assets/**"
+      - "Packages/**"
+      - "ProjectSettings/**"
+      - "scripts/validate-vitrial-headless.sh"
+      - ".github/workflows/vitrial-unity.yml"
+  pull_request:
+    branches:
+      - main
+      - VA-V1
+    paths:
+      - "Assets/**"
+      - "Packages/**"
+      - "ProjectSettings/**"
+      - "scripts/validate-vitrial-headless.sh"
+      - ".github/workflows/vitrial-unity.yml"
+  workflow_dispatch:
+    inputs:
+      runUnityBuild:
+        description: "Run the licensed Unity Windows build job"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+concurrency:
+  group: vitrial-unity-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UNITY_VERSION: 2022.3.55f1
+  UNITY_PROJECT_PATH: .
+
+jobs:
+  vitrial_static:
+    name: Vitrial static scaffold checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Unity scaffold without Unity Editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh scripts/validate-vitrial-headless.sh
+          python3 -m json.tool Packages/manifest.json >/dev/null
+          python3 -m json.tool Assets/Game/Vitrial.Game.asmdef >/dev/null
+
+      - name: Guard against generated Unity cache directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          forbidden=(Library Temp Obj Build Builds UserSettings Logs MemoryCaptures)
+          found=0
+          for path in "${forbidden[@]}"; do
+            if git ls-files --error-unmatch "$path" "$path/**" >/dev/null 2>&1; then
+              echo "::error::Generated Unity path is tracked in git: $path"
+              found=1
+            fi
+          done
+          exit "$found"
+
+  unity_license:
+    name: Unity license secret check
+    runs-on: ubuntu-latest
+    outputs:
+      has_license: ${{ steps.detect.outputs.has_license }}
+    steps:
+      - name: Detect GameCI secrets
+        id: detect
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${UNITY_LICENSE:-}" ] && [ -n "${UNITY_EMAIL:-}" ] && [ -n "${UNITY_PASSWORD:-}" ]; then
+            echo "has_license=true" >> "$GITHUB_OUTPUT"
+            echo "GameCI Unity secrets are configured."
+          else
+            echo "has_license=false" >> "$GITHUB_OUTPUT"
+            echo "Unity licensed jobs will be skipped. Configure UNITY_LICENSE, UNITY_EMAIL, and UNITY_PASSWORD."
+          fi
+
+  unity_editmode_tests:
+    name: Unity EditMode compile/test gate
+    needs:
+      - vitrial_static
+      - unity_license
+    runs-on: ubuntu-latest
+    if: ${{ needs.unity_license.outputs.has_license == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+
+      - name: Run Unity EditMode tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.UNITY_PROJECT_PATH }}
+          testMode: EditMode
+          artifactsPath: unity-test-results
+          checkName: Vitrial Unity EditMode Tests
+
+      - name: Upload Unity test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitrial-unity-editmode-results
+          path: unity-test-results
+          if-no-files-found: ignore
+
+  unity_windows_build:
+    name: Unity Windows client build
+    needs:
+      - unity_editmode_tests
+      - unity_license
+    runs-on: ubuntu-latest
+    if: ${{ needs.unity_license.outputs.has_license == 'true' && (github.event_name != 'workflow_dispatch' || inputs.runUnityBuild == 'true') }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-build-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+
+      - name: Build Windows client
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.UNITY_PROJECT_PATH }}
+          targetPlatform: StandaloneWindows64
+          buildsPath: build
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vitrial-Windows-Standalone
+          path: build/StandaloneWindows64
+          if-no-files-found: error
+
+  unity_license_missing:
+    name: Unity licensed jobs skipped
+    needs:
+      - vitrial_static
+      - unity_license
+    runs-on: ubuntu-latest
+    if: ${{ needs.unity_license.outputs.has_license != 'true' }}
+    steps:
+      - name: Explain skipped Unity jobs
+        run: |
+          echo "Unity licensed jobs skipped. Configure repository secrets UNITY_LICENSE, UNITY_EMAIL, and UNITY_PASSWORD to enable GameCI."
