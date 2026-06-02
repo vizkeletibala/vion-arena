@@ -22,6 +22,7 @@ Assets/Game/Prefabs/Weapons
 Assets/Game/Prefabs/Enemies
 Assets/Game/ScriptableObjects/Weapons
 Assets/Game/ScriptableObjects/Enemies
+ProjectSettings/EditorBuildSettings.asset
 ProjectSettings/ProjectVersion.txt
 Packages/manifest.json'
 
