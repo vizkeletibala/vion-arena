@@ -37,6 +37,8 @@ Future Linux server packaging and deployment skeletons live in:
 - `deploy/docker-compose.vitrial-server.yml`
 - `docs/vitrial-automation.md`
 
+For the CI/CD recommendation that separates current EC2/Jenkins static checks from real Unity-capable compile/playmode/build lanes, see `docs/vitrial-ci-cd-strategy.md`.
+
 ## Windows/Unity Editor follow-up
 
 This Milestone 1 slice was assembled on a headless EC2 host and still requires Unity Editor validation on Windows. On Windows:

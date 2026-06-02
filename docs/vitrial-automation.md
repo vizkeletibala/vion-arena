@@ -1,6 +1,6 @@
 # Vitrial EC2 Automation And Dedicated Server Plan
 
-This document is the Milestone 2 CI/server foundation for the Vitrial Unity lane. It deliberately reuses the existing Vion Project stack instead of introducing a second deployment island.
+This document is the Milestone 2 CI/server foundation for the Vitrial Unity lane. It deliberately reuses the existing Vion Project stack instead of introducing a second deployment island. For Andrew's CI/CD decision lane beyond the current EC2 static checks, see `docs/vitrial-ci-cd-strategy.md`.
 
 ## Responsibility split
 
